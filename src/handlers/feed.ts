@@ -1,5 +1,8 @@
 import { db } from "../db.ts";
 
+const isValidUuid = (s: string): boolean =>
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
+
 type FeedEntry = {
   readonly kind: "reaction" | "comment" | "link";
   readonly createdAt: number;
@@ -72,6 +75,11 @@ const getFeed = async (
   params: Record<string, string>,
 ): Promise<Response> => {
   const userId = params.userId!;
+  if (!isValidUuid(userId))
+    return Response.json(
+      { error: "Invalid user ID", code: "INVALID_INPUT" },
+      { status: 400 },
+    );
   const [entries, email] = await Promise.all([
     buildFeedEntries(userId),
     getUserEmail(userId),
@@ -109,6 +117,11 @@ const getFeedRss = async (
   params: Record<string, string>,
 ): Promise<Response> => {
   const userId = params.userId!;
+  if (!isValidUuid(userId))
+    return Response.json(
+      { error: "Invalid user ID", code: "INVALID_INPUT" },
+      { status: 400 },
+    );
   const [entries, email] = await Promise.all([
     buildFeedEntries(userId),
     getUserEmail(userId),
