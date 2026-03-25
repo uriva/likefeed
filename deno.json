@@ -25,12 +25,6 @@
     "@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.5",
     "vite": "npm:vite@^7.1.5"
   },
-  "deploy": {
-    "build": "deno task build:web",
-    "runtime": {
-      "entrypoint": "src/main.ts"
-    }
-  },
   "nodeModulesDir": "auto",
   "compilerOptions": {
     "strict": true,
