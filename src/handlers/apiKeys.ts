@@ -56,7 +56,7 @@ const listApiKeys = async (
     },
   });
   return Response.json({
-    data: apiKeys.map((k) => ({
+    data: apiKeys.map((k: any) => ({
       id: k.id,
       prefix: k.prefix,
       name: k.name,

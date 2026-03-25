@@ -34,7 +34,7 @@ const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> =
     }),
   ]);
 
-  const reactionEntries: FeedEntry[] = reactionsResult.reactions.map((r) => ({
+  const reactionEntries: FeedEntry[] = reactionsResult.reactions.map((r: any) => ({
     kind: "reaction",
     createdAt: r.createdAt,
     url: r.item?.url ?? "",
@@ -42,7 +42,7 @@ const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> =
     detail: r.type,
   }));
 
-  const commentEntries: FeedEntry[] = commentsResult.comments.map((c) => ({
+  const commentEntries: FeedEntry[] = commentsResult.comments.map((c: any) => ({
     kind: "comment",
     createdAt: c.createdAt,
     url: c.item?.url ?? "",
@@ -50,7 +50,7 @@ const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> =
     detail: c.text,
   }));
 
-  const linkEntries: FeedEntry[] = linksResult.itemLinks.map((l) => ({
+  const linkEntries: FeedEntry[] = linksResult.itemLinks.map((l: any) => ({
     kind: "link",
     createdAt: l.createdAt,
     url: l.sourceItem?.url ?? "",

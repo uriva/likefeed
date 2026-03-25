@@ -34,7 +34,7 @@ const createReaction = async (
       $: { where: { "user.id": userId, "item.id": itemId } },
     },
   });
-  const deleteTxs = existing.map((r) => db.tx.reactions[r.id]!.delete());
+  const deleteTxs = existing.map((r: any) => db.tx.reactions[r.id]!.delete());
 
   const reactionId = id();
   await db.transact([
@@ -64,7 +64,7 @@ const listReactions = async (
     },
   });
   return Response.json({
-    data: reactions.map((r) => ({
+    data: reactions.map((r: any) => ({
       id: r.id,
       type: r.type,
       url: r.item?.url ?? "",

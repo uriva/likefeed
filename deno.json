@@ -26,10 +26,8 @@
     "vite": "npm:vite@^7.1.5"
   },
   "deploy": {
-    "build": "deno task build:web",
-    "runtime": {
-      "entrypoint": "src/main.ts"
-    }
+    "org": "uriva",
+    "app": "likefeed-api3"
   },
   "nodeModulesDir": "auto",
   "compilerOptions": {

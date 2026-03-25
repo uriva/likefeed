@@ -37,7 +37,7 @@ const listComments = async (
     },
   });
   return Response.json({
-    data: comments.map((c) => ({
+    data: comments.map((c: any) => ({
       id: c.id,
       text: c.text,
       url: c.item?.url ?? "",

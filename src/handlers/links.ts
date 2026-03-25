@@ -46,7 +46,7 @@ const listItemLinks = async (
     },
   });
   return Response.json({
-    data: itemLinks.map((l) => ({
+    data: itemLinks.map((l: any) => ({
       id: l.id,
       sourceUrl: l.sourceItem?.url ?? "",
       sourceTitle: l.sourceItem?.title ?? "",
