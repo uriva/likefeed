@@ -1,85 +1,179 @@
-import { i } from "@instantdb/admin";
+// Docs: https://www.instantdb.com/docs/modeling-data
+
+import { i } from "@instantdb/core";
 
 const _schema = i.schema({
   entities: {
+    $files: i.entity({
+      path: i.string().unique().indexed(),
+      url: i.string(),
+    }),
+    $streams: i.entity({
+      abortReason: i.string().optional(),
+      clientId: i.string().unique().indexed(),
+      done: i.boolean().optional(),
+      size: i.number().optional(),
+    }),
     $users: i.entity({
-      email: i.string().unique().indexed(),
+      email: i.string().unique().indexed().optional(),
+      imageURL: i.string().optional(),
+      type: i.string().optional(),
     }),
-    items: i.entity({
-      url: i.string().unique().indexed(),
-      title: i.string().optional(),
+    apiKeys: i.entity({
       createdAt: i.number().indexed(),
-    }),
-    reactions: i.entity({
-      type: i.string().indexed(),
-      createdAt: i.number().indexed(),
+      keyHash: i.string().unique(),
+      lastUsedAt: i.number().optional(),
+      name: i.string(),
+      prefix: i.string(),
     }),
     comments: i.entity({
-      text: i.string(),
       createdAt: i.number().indexed(),
+      text: i.string(),
     }),
     itemLinks: i.entity({
       createdAt: i.number().indexed(),
     }),
-    apiKeys: i.entity({
-      keyHash: i.string().unique(),
-      prefix: i.string(),
-      name: i.string(),
+    items: i.entity({
       createdAt: i.number().indexed(),
-      lastUsedAt: i.number().optional(),
+      title: i.string().optional(),
+      url: i.string().unique().indexed(),
+    }),
+    reactions: i.entity({
+      createdAt: i.number().indexed(),
+      type: i.string().indexed(),
     }),
   },
   links: {
-    userReactions: {
-      forward: { on: "reactions", has: "one", label: "user" },
-      reverse: { on: "$users", has: "many", label: "reactions" },
+    $streams$files: {
+      forward: {
+        on: "$streams",
+        has: "many",
+        label: "$files",
+      },
+      reverse: {
+        on: "$files",
+        has: "one",
+        label: "$stream",
+        onDelete: "cascade",
+      },
     },
-    userComments: {
-      forward: { on: "comments", has: "one", label: "user" },
-      reverse: { on: "$users", has: "many", label: "comments" },
+    $usersLinkedPrimaryUser: {
+      forward: {
+        on: "$users",
+        has: "one",
+        label: "linkedPrimaryUser",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "$users",
+        has: "many",
+        label: "linkedGuestUsers",
+      },
     },
-    userItemLinks: {
-      forward: { on: "itemLinks", has: "one", label: "user" },
-      reverse: { on: "$users", has: "many", label: "itemLinks" },
-    },
-    userApiKeys: {
+    apiKeysUser: {
       forward: {
         on: "apiKeys",
         has: "one",
         label: "user",
         onDelete: "cascade",
       },
-      reverse: { on: "$users", has: "many", label: "apiKeys" },
-    },
-    itemReactions: {
-      forward: {
-        on: "reactions",
-        has: "one",
-        label: "item",
-        onDelete: "cascade",
+      reverse: {
+        on: "$users",
+        has: "many",
+        label: "apiKeys",
       },
-      reverse: { on: "items", has: "many", label: "reactions" },
     },
-    itemComments: {
+    commentsItem: {
       forward: {
         on: "comments",
         has: "one",
         label: "item",
         onDelete: "cascade",
       },
-      reverse: { on: "items", has: "many", label: "comments" },
+      reverse: {
+        on: "items",
+        has: "many",
+        label: "comments",
+      },
     },
-    linkSource: {
-      forward: { on: "itemLinks", has: "one", label: "sourceItem" },
-      reverse: { on: "items", has: "many", label: "outgoingLinks" },
+    commentsUser: {
+      forward: {
+        on: "comments",
+        has: "one",
+        label: "user",
+      },
+      reverse: {
+        on: "$users",
+        has: "many",
+        label: "comments",
+      },
     },
-    linkTarget: {
-      forward: { on: "itemLinks", has: "one", label: "targetItem" },
-      reverse: { on: "items", has: "many", label: "incomingLinks" },
+    itemLinksSourceItem: {
+      forward: {
+        on: "itemLinks",
+        has: "one",
+        label: "sourceItem",
+      },
+      reverse: {
+        on: "items",
+        has: "many",
+        label: "outgoingLinks",
+      },
+    },
+    itemLinksTargetItem: {
+      forward: {
+        on: "itemLinks",
+        has: "one",
+        label: "targetItem",
+      },
+      reverse: {
+        on: "items",
+        has: "many",
+        label: "incomingLinks",
+      },
+    },
+    itemLinksUser: {
+      forward: {
+        on: "itemLinks",
+        has: "one",
+        label: "user",
+      },
+      reverse: {
+        on: "$users",
+        has: "many",
+        label: "itemLinks",
+      },
+    },
+    reactionsItem: {
+      forward: {
+        on: "reactions",
+        has: "one",
+        label: "item",
+        onDelete: "cascade",
+      },
+      reverse: {
+        on: "items",
+        has: "many",
+        label: "reactions",
+      },
+    },
+    reactionsUser: {
+      forward: {
+        on: "reactions",
+        has: "one",
+        label: "user",
+      },
+      reverse: {
+        on: "$users",
+        has: "many",
+        label: "reactions",
+      },
     },
   },
+  rooms: {},
 });
 
+// This helps TypeScript display nicer intellisense
 type _AppSchema = typeof _schema;
 interface AppSchema extends _AppSchema {}
 const schema: AppSchema = _schema;

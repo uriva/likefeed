@@ -242,16 +242,26 @@ const getContentType = (path: string): string => {
 
 const serveStaticFile = async (filePath: string): Promise<Response | null> => {
   try {
-    const data = await Deno.readFile(filePath);
+    let data = await Deno.readFile(filePath);
     const isAsset = filePath.includes("/assets/");
-    return new Response(data, {
-      headers: {
-        "content-type": getContentType(filePath),
-        ...(isAsset
-          ? { "cache-control": "public, max-age=31536000, immutable" }
-          : { "cache-control": "no-cache" }),
-      },
-    });
+    const headers: Record<string, string> = {
+      "content-type": getContentType(filePath),
+      ...(isAsset
+        ? { "cache-control": "public, max-age=31536000, immutable" }
+        : { "cache-control": "no-cache" }),
+    };
+
+    if (filePath.endsWith("index.html")) {
+      const text = new TextDecoder("utf-8").decode(data);
+      const appId = Deno.env.get("VITE_INSTANT_APP_ID") || Deno.env.get("INSTANT_APP_ID") || "";
+      const injectedText = text.replace(
+        "<head>",
+        `<head>\n    <script>window.ENV = { VITE_INSTANT_APP_ID: "${appId}" };</script>`
+      );
+      data = new TextEncoder().encode(injectedText);
+    }
+
+    return new Response(data, { headers });
   } catch {
     return null;
   }
