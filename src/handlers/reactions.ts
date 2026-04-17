@@ -1,5 +1,5 @@
 import { db, id } from "../db.ts";
-import type { CreateReactionInput, ApiResponse } from "../types.ts";
+import type { ApiResponse, CreateReactionInput } from "../types.ts";
 
 const getOrCreateItem = async (
   url: string,
@@ -47,7 +47,9 @@ const createReaction = async (
   ]);
 
   return Response.json(
-    { data: { id: reactionId, type: input.type, url: input.url } } satisfies ApiResponse<unknown>,
+    {
+      data: { id: reactionId, type: input.type, url: input.url },
+    } satisfies ApiResponse<unknown>,
     { status: 201 },
   );
 };
@@ -63,15 +65,17 @@ const listReactions = async (
       item: {},
     },
   });
-  return Response.json({
-    data: reactions.map((r: any) => ({
-      id: r.id,
-      type: r.type,
-      url: r.item?.url ?? "",
-      title: r.item?.title ?? "",
-      createdAt: r.createdAt,
-    })),
-  } satisfies ApiResponse<unknown>);
+  return Response.json(
+    {
+      data: reactions.map((r: any) => ({
+        id: r.id,
+        type: r.type,
+        url: r.item?.url ?? "",
+        title: r.item?.title ?? "",
+        createdAt: r.createdAt,
+      })),
+    } satisfies ApiResponse<unknown>,
+  );
 };
 
 const deleteReaction = async (
@@ -94,4 +98,4 @@ const deleteReaction = async (
   return new Response(null, { status: 204 });
 };
 
-export { createReaction, listReactions, deleteReaction, getOrCreateItem };
+export { createReaction, deleteReaction, getOrCreateItem, listReactions };

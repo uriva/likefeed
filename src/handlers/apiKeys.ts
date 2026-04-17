@@ -40,7 +40,9 @@ const createApiKey = async (
   ]);
 
   return Response.json(
-    { data: { id: keyId, key: rawKey, name, prefix } } satisfies ApiResponse<unknown>,
+    { data: { id: keyId, key: rawKey, name, prefix } } satisfies ApiResponse<
+      unknown
+    >,
     { status: 201 },
   );
 };
@@ -55,15 +57,17 @@ const listApiKeys = async (
       $: { where: { "user.id": userId }, order: { createdAt: "desc" } },
     },
   });
-  return Response.json({
-    data: apiKeys.map((k: any) => ({
-      id: k.id,
-      prefix: k.prefix,
-      name: k.name,
-      createdAt: k.createdAt,
-      lastUsedAt: k.lastUsedAt ?? null,
-    })),
-  } satisfies ApiResponse<unknown>);
+  return Response.json(
+    {
+      data: apiKeys.map((k: any) => ({
+        id: k.id,
+        prefix: k.prefix,
+        name: k.name,
+        createdAt: k.createdAt,
+        lastUsedAt: k.lastUsedAt ?? null,
+      })),
+    } satisfies ApiResponse<unknown>,
+  );
 };
 
 const deleteApiKey = async (
@@ -86,4 +90,4 @@ const deleteApiKey = async (
   return new Response(null, { status: 204 });
 };
 
-export { createApiKey, listApiKeys, deleteApiKey, hashApiKey };
+export { createApiKey, deleteApiKey, hashApiKey, listApiKeys };

@@ -87,10 +87,10 @@ const Landing = () => {
               your attention, your data.
             </p>
             <p>
-              Now LLMs can curate the open web for you. The one thing they
-              can't replace is the social signal. What did your friend think
-              about that article? What tools is that developer you respect
-              actually using?
+              Now LLMs can curate the open web for you. The one thing they can't
+              replace is the social signal. What did your friend think about
+              that article? What tools is that developer you respect actually
+              using?
             </p>
             <p class="text-slate-300">
               likefeed gives that social layer back to RSS. No platform needed.

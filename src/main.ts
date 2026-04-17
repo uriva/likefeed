@@ -2,25 +2,25 @@ import { db } from "./db.ts";
 import type { ApiError } from "./types.ts";
 import {
   createReaction,
-  listReactions,
   deleteReaction,
+  listReactions,
 } from "./handlers/reactions.ts";
 import {
   createComment,
-  listComments,
   deleteComment,
+  listComments,
 } from "./handlers/comments.ts";
 import {
   createItemLink,
-  listItemLinks,
   deleteItemLink,
+  listItemLinks,
 } from "./handlers/links.ts";
 import { getFeed, getFeedRss } from "./handlers/feed.ts";
 import {
   createApiKey,
-  listApiKeys,
   deleteApiKey,
   hashApiKey,
+  listApiKeys,
 } from "./handlers/apiKeys.ts";
 
 type AuthType = "apiKey" | "apiKeyOrUserToken" | "userToken" | "none";
@@ -96,12 +96,22 @@ const routes: readonly Route[] = [
   // Reactions
   route("POST", "/v1/reactions", createReaction, "apiKeyOrUserToken"),
   route("GET", "/v1/reactions", listReactions, "apiKeyOrUserToken"),
-  route("DELETE", "/v1/reactions/:reactionId", deleteReaction, "apiKeyOrUserToken"),
+  route(
+    "DELETE",
+    "/v1/reactions/:reactionId",
+    deleteReaction,
+    "apiKeyOrUserToken",
+  ),
 
   // Comments
   route("POST", "/v1/comments", createComment, "apiKeyOrUserToken"),
   route("GET", "/v1/comments", listComments, "apiKeyOrUserToken"),
-  route("DELETE", "/v1/comments/:commentId", deleteComment, "apiKeyOrUserToken"),
+  route(
+    "DELETE",
+    "/v1/comments/:commentId",
+    deleteComment,
+    "apiKeyOrUserToken",
+  ),
 
   // Links
   route("POST", "/v1/links", createItemLink, "apiKeyOrUserToken"),
@@ -163,16 +173,18 @@ const resolveAuth = async (
 
   if (authType === "apiKey") {
     const userId = await authenticateApiKey(req);
-    return userId
-      ? { userId, error: null }
-      : { userId: null, error: jsonError(401, "Invalid API key", "UNAUTHORIZED") };
+    return userId ? { userId, error: null } : {
+      userId: null,
+      error: jsonError(401, "Invalid API key", "UNAUTHORIZED"),
+    };
   }
 
   if (authType === "userToken") {
     const userId = await authenticateUserToken(req);
-    return userId
-      ? { userId, error: null }
-      : { userId: null, error: jsonError(401, "Invalid user token", "UNAUTHORIZED") };
+    return userId ? { userId, error: null } : {
+      userId: null,
+      error: jsonError(401, "Invalid user token", "UNAUTHORIZED"),
+    };
   }
 
   // apiKeyOrUserToken
@@ -180,9 +192,10 @@ const resolveAuth = async (
   if (apiKeyUserId) return { userId: apiKeyUserId, error: null };
 
   const tokenUserId = await authenticateUserToken(req);
-  return tokenUserId
-    ? { userId: tokenUserId, error: null }
-    : { userId: null, error: jsonError(401, "Invalid credentials", "UNAUTHORIZED") };
+  return tokenUserId ? { userId: tokenUserId, error: null } : {
+    userId: null,
+    error: jsonError(401, "Invalid credentials", "UNAUTHORIZED"),
+  };
 };
 
 const handleRequest = async (req: Request): Promise<Response> => {
@@ -194,7 +207,10 @@ const handleRequest = async (req: Request): Promise<Response> => {
   if (!matched) return jsonError(404, "Not found", "NOT_FOUND");
 
   const { route: matchedRoute, params } = matched;
-  const { userId, error: authError } = await resolveAuth(req, matchedRoute.authType);
+  const { userId, error: authError } = await resolveAuth(
+    req,
+    matchedRoute.authType,
+  );
   if (authError) return authError;
 
   try {
@@ -253,10 +269,11 @@ const serveStaticFile = async (filePath: string): Promise<Response | null> => {
 
     if (filePath.endsWith("index.html")) {
       const text = new TextDecoder("utf-8").decode(data);
-      const appId = Deno.env.get("VITE_INSTANT_APP_ID") || Deno.env.get("INSTANT_APP_ID") || "";
+      const appId = Deno.env.get("VITE_INSTANT_APP_ID") ||
+        Deno.env.get("INSTANT_APP_ID") || "";
       const injectedText = text.replace(
         "<head>",
-        `<head>\n    <script>window.ENV = { VITE_INSTANT_APP_ID: "${appId}" };</script>`
+        `<head>\n    <script>window.ENV = { VITE_INSTANT_APP_ID: "${appId}" };</script>`,
       );
       data = new TextEncoder().encode(injectedText);
     }
@@ -279,8 +296,8 @@ const handler = async (req: Request): Promise<Response> => {
   const response = await handleRequest(req);
   if (response.status === 404) {
     const url = new URL(req.url);
-    const isApiPath =
-      url.pathname.startsWith("/v1/") || url.pathname === "/health";
+    const isApiPath = url.pathname.startsWith("/v1/") ||
+      url.pathname === "/health";
     if (!isApiPath && req.method === "GET") {
       const staticResponse = await handleStatic(req);
       if (staticResponse) return staticResponse;

@@ -1,5 +1,5 @@
 import { db, id } from "../db.ts";
-import type { CreateLinkInput, ApiResponse } from "../types.ts";
+import type { ApiResponse, CreateLinkInput } from "../types.ts";
 import { getOrCreateItem } from "./reactions.ts";
 
 const createItemLink = async (
@@ -45,16 +45,18 @@ const listItemLinks = async (
       targetItem: {},
     },
   });
-  return Response.json({
-    data: itemLinks.map((l: any) => ({
-      id: l.id,
-      sourceUrl: l.sourceItem?.url ?? "",
-      sourceTitle: l.sourceItem?.title ?? "",
-      targetUrl: l.targetItem?.url ?? "",
-      targetTitle: l.targetItem?.title ?? "",
-      createdAt: l.createdAt,
-    })),
-  } satisfies ApiResponse<unknown>);
+  return Response.json(
+    {
+      data: itemLinks.map((l: any) => ({
+        id: l.id,
+        sourceUrl: l.sourceItem?.url ?? "",
+        sourceTitle: l.sourceItem?.title ?? "",
+        targetUrl: l.targetItem?.url ?? "",
+        targetTitle: l.targetItem?.title ?? "",
+        createdAt: l.createdAt,
+      })),
+    } satisfies ApiResponse<unknown>,
+  );
 };
 
 const deleteItemLink = async (
@@ -77,4 +79,4 @@ const deleteItemLink = async (
   return new Response(null, { status: 204 });
 };
 
-export { createItemLink, listItemLinks, deleteItemLink };
+export { createItemLink, deleteItemLink, listItemLinks };

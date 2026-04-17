@@ -1,5 +1,5 @@
 import { db, id } from "../db.ts";
-import type { CreateCommentInput, ApiResponse } from "../types.ts";
+import type { ApiResponse, CreateCommentInput } from "../types.ts";
 import { getOrCreateItem } from "./reactions.ts";
 
 const createComment = async (
@@ -20,7 +20,9 @@ const createComment = async (
   ]);
 
   return Response.json(
-    { data: { id: commentId, text: input.text, url: input.url } } satisfies ApiResponse<unknown>,
+    {
+      data: { id: commentId, text: input.text, url: input.url },
+    } satisfies ApiResponse<unknown>,
     { status: 201 },
   );
 };
@@ -36,15 +38,17 @@ const listComments = async (
       item: {},
     },
   });
-  return Response.json({
-    data: comments.map((c: any) => ({
-      id: c.id,
-      text: c.text,
-      url: c.item?.url ?? "",
-      title: c.item?.title ?? "",
-      createdAt: c.createdAt,
-    })),
-  } satisfies ApiResponse<unknown>);
+  return Response.json(
+    {
+      data: comments.map((c: any) => ({
+        id: c.id,
+        text: c.text,
+        url: c.item?.url ?? "",
+        title: c.item?.title ?? "",
+        createdAt: c.createdAt,
+      })),
+    } satisfies ApiResponse<unknown>,
+  );
 };
 
 const deleteComment = async (
@@ -67,4 +71,4 @@ const deleteComment = async (
   return new Response(null, { status: 204 });
 };
 
-export { createComment, listComments, deleteComment };
+export { createComment, deleteComment, listComments };

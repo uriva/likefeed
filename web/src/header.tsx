@@ -1,4 +1,4 @@
-import { useAuth, auth } from "./db.ts";
+import { auth, useAuth } from "./db.ts";
 
 const Header = () => {
   const { user } = useAuth();
@@ -10,30 +10,32 @@ const Header = () => {
           likefeed
         </a>
         <div class="flex items-center gap-4">
-          {user ? (
-            <>
+          {user
+            ? (
+              <>
+                <a
+                  href="/app"
+                  class="text-sm text-slate-400 hover:text-white transition-colors"
+                >
+                  Dashboard
+                </a>
+                <span class="text-sm text-slate-500">{user.email}</span>
+                <button
+                  onClick={() => auth.signOut()}
+                  class="text-sm text-slate-400 hover:text-white transition-colors"
+                >
+                  Sign out
+                </button>
+              </>
+            )
+            : (
               <a
-                href="/app"
+                href="/login"
                 class="text-sm text-slate-400 hover:text-white transition-colors"
               >
-                Dashboard
+                Sign in
               </a>
-              <span class="text-sm text-slate-500">{user.email}</span>
-              <button
-                onClick={() => auth.signOut()}
-                class="text-sm text-slate-400 hover:text-white transition-colors"
-              >
-                Sign out
-              </button>
-            </>
-          ) : (
-            <a
-              href="/login"
-              class="text-sm text-slate-400 hover:text-white transition-colors"
-            >
-              Sign in
-            </a>
-          )}
+            )}
         </div>
       </div>
     </header>

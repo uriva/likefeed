@@ -1,6 +1,6 @@
 import type { ComponentChildren } from "preact";
 import { useState } from "preact/hooks";
-import { useQuery, useAuth } from "./db.ts";
+import { useAuth, useQuery } from "./db.ts";
 
 // @ts-ignore: Vite injects import.meta.env at build time
 const API_BASE: string = import.meta.env.VITE_API_BASE_URL ?? "";
@@ -100,7 +100,11 @@ const AddReaction = ({ userToken }: { userToken: string }) => {
       const res = await fetch(`${API_BASE}/v1/reactions`, {
         method: "POST",
         headers: apiHeaders(userToken),
-        body: JSON.stringify({ url: url.trim(), type, title: title.trim() || undefined }),
+        body: JSON.stringify({
+          url: url.trim(),
+          type,
+          title: title.trim() || undefined,
+        }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -169,7 +173,11 @@ const AddComment = ({ userToken }: { userToken: string }) => {
       const res = await fetch(`${API_BASE}/v1/comments`, {
         method: "POST",
         headers: apiHeaders(userToken),
-        body: JSON.stringify({ url: url.trim(), text: text.trim(), title: title.trim() || undefined }),
+        body: JSON.stringify({
+          url: url.trim(),
+          text: text.trim(),
+          title: title.trim() || undefined,
+        }),
       });
       if (!res.ok) {
         const err = await res.json();
@@ -204,7 +212,8 @@ const AddComment = ({ userToken }: { userToken: string }) => {
         />
         <textarea
           value={text}
-          onInput={(e: Event) => setText((e.target as HTMLTextAreaElement).value)}
+          onInput={(e: Event) =>
+            setText((e.target as HTMLTextAreaElement).value)}
           placeholder="Your comment"
           rows={3}
           class="w-full bg-slate-900 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:border-blue-500 focus:outline-none resize-none"
@@ -267,28 +276,32 @@ const AddLink = ({ userToken }: { userToken: string }) => {
           <input
             type="text"
             value={sourceUrl}
-            onInput={(e: Event) => setSourceUrl((e.target as HTMLInputElement).value)}
+            onInput={(e: Event) =>
+              setSourceUrl((e.target as HTMLInputElement).value)}
             placeholder="Source URL"
             class="bg-slate-900 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
           <input
             type="text"
             value={targetUrl}
-            onInput={(e: Event) => setTargetUrl((e.target as HTMLInputElement).value)}
+            onInput={(e: Event) =>
+              setTargetUrl((e.target as HTMLInputElement).value)}
             placeholder="Target URL"
             class="bg-slate-900 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
           <input
             type="text"
             value={sourceTitle}
-            onInput={(e: Event) => setSourceTitle((e.target as HTMLInputElement).value)}
+            onInput={(e: Event) =>
+              setSourceTitle((e.target as HTMLInputElement).value)}
             placeholder="Source title (optional)"
             class="bg-slate-900 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
           <input
             type="text"
             value={targetTitle}
-            onInput={(e: Event) => setTargetTitle((e.target as HTMLInputElement).value)}
+            onInput={(e: Event) =>
+              setTargetTitle((e.target as HTMLInputElement).value)}
             placeholder="Target title (optional)"
             class="bg-slate-900 border border-slate-700 text-white text-sm rounded-lg px-3 py-2 placeholder-slate-500 focus:border-blue-500 focus:outline-none"
           />
@@ -321,41 +334,52 @@ const ReactionsList = ({ userId }: { userId: string }) => {
 
   return (
     <Card title={`Reactions (${reactions.length})`}>
-      {reactions.length === 0 ? (
-        <div class="text-slate-500 text-center py-4">
-          No reactions yet. Like or dislike a URL above.
-        </div>
-      ) : (
-        <div class="space-y-2">
-          {reactions.map(
-            (r: { id: string; type: string; createdAt: number; item?: { url: string; title?: string } }) => (
-              <div
-                key={r.id}
-                class="flex items-center gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700"
-              >
-                <span
-                  class={`text-lg ${r.type === "like" ? "text-green-400" : "text-red-400"}`}
+      {reactions.length === 0
+        ? (
+          <div class="text-slate-500 text-center py-4">
+            No reactions yet. Like or dislike a URL above.
+          </div>
+        )
+        : (
+          <div class="space-y-2">
+            {reactions.map(
+              (
+                r: {
+                  id: string;
+                  type: string;
+                  createdAt: number;
+                  item?: { url: string; title?: string };
+                },
+              ) => (
+                <div
+                  key={r.id}
+                  class="flex items-center gap-3 p-3 bg-slate-900 rounded-lg border border-slate-700"
                 >
-                  {r.type === "like" ? "+" : "-"}
-                </span>
-                <div class="flex-1 min-w-0">
-                  <a
-                    href={r.item?.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-sm text-blue-400 hover:text-blue-300 truncate block"
+                  <span
+                    class={`text-lg ${
+                      r.type === "like" ? "text-green-400" : "text-red-400"
+                    }`}
                   >
-                    {r.item?.title || r.item?.url || ""}
-                  </a>
+                    {r.type === "like" ? "+" : "-"}
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <a
+                      href={r.item?.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      class="text-sm text-blue-400 hover:text-blue-300 truncate block"
+                    >
+                      {r.item?.title || r.item?.url || ""}
+                    </a>
+                  </div>
+                  <span class="text-xs text-slate-500 flex-shrink-0">
+                    {new Date(r.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-                <span class="text-xs text-slate-500 flex-shrink-0">
-                  {new Date(r.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            ),
-          )}
-        </div>
-      )}
+              ),
+            )}
+          </div>
+        )}
     </Card>
   );
 };
@@ -375,35 +399,44 @@ const CommentsList = ({ userId }: { userId: string }) => {
 
   return (
     <Card title={`Comments (${comments.length})`}>
-      {comments.length === 0 ? (
-        <div class="text-slate-500 text-center py-4">
-          No comments yet.
-        </div>
-      ) : (
-        <div class="space-y-2">
-          {comments.map(
-            (c: { id: string; text: string; createdAt: number; item?: { url: string; title?: string } }) => (
-              <div
-                key={c.id}
-                class="p-3 bg-slate-900 rounded-lg border border-slate-700"
-              >
-                <a
-                  href={c.item?.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-xs text-blue-400 hover:text-blue-300 truncate block mb-1"
+      {comments.length === 0
+        ? (
+          <div class="text-slate-500 text-center py-4">
+            No comments yet.
+          </div>
+        )
+        : (
+          <div class="space-y-2">
+            {comments.map(
+              (
+                c: {
+                  id: string;
+                  text: string;
+                  createdAt: number;
+                  item?: { url: string; title?: string };
+                },
+              ) => (
+                <div
+                  key={c.id}
+                  class="p-3 bg-slate-900 rounded-lg border border-slate-700"
                 >
-                  {c.item?.title || c.item?.url || ""}
-                </a>
-                <p class="text-sm text-slate-300">{c.text}</p>
-                <span class="text-xs text-slate-500">
-                  {new Date(c.createdAt).toLocaleDateString()}
-                </span>
-              </div>
-            ),
-          )}
-        </div>
-      )}
+                  <a
+                    href={c.item?.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-xs text-blue-400 hover:text-blue-300 truncate block mb-1"
+                  >
+                    {c.item?.title || c.item?.url || ""}
+                  </a>
+                  <p class="text-sm text-slate-300">{c.text}</p>
+                  <span class="text-xs text-slate-500">
+                    {new Date(c.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ),
+            )}
+          </div>
+        )}
     </Card>
   );
 };
@@ -498,7 +531,14 @@ const ApiKeySection = ({ userToken }: { userToken: string }) => {
       {!isLoading && keys.length > 0 && (
         <div class="space-y-2 mb-4">
           {keys.map(
-            (k: { id: string; prefix: string; name: string; createdAt: number }) => (
+            (
+              k: {
+                id: string;
+                prefix: string;
+                name: string;
+                createdAt: number;
+              },
+            ) => (
               <div
                 key={k.id}
                 class="flex items-center justify-between p-2 bg-slate-900 rounded border border-slate-700"
@@ -527,7 +567,8 @@ const ApiKeySection = ({ userToken }: { userToken: string }) => {
         {creating ? "Creating..." : "Generate API key"}
       </button>
 
-      {createError && <div class="text-red-400 text-sm mt-2">{createError}</div>}
+      {createError && <div class="text-red-400 text-sm mt-2">{createError}
+      </div>}
     </Card>
   );
 };

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "preact/hooks";
+import { useEffect, useState } from "preact/hooks";
 import { useRoute } from "preact-iso";
 
 // @ts-ignore: Vite injects import.meta.env at build time
@@ -26,7 +26,9 @@ const KindBadge = ({ kind }: { kind: string }) => {
 
   return (
     <span
-      class={`text-xs px-2 py-0.5 rounded font-medium ${colors[kind] ?? "bg-slate-700 text-slate-300"}`}
+      class={`text-xs px-2 py-0.5 rounded font-medium ${
+        colors[kind] ?? "bg-slate-700 text-slate-300"
+      }`}
     >
       {kind}
     </span>
@@ -110,17 +112,22 @@ const Feed = () => {
           RSS feed
         </a>
       </div>
-      {data.entries.length === 0 ? (
-        <div class="text-slate-500 text-center py-12">
-          This feed is empty.
-        </div>
-      ) : (
-        <div class="space-y-3">
-          {data.entries.map((entry, i) => (
-            <FeedItem key={`${entry.url}-${entry.createdAt}-${i}`} entry={entry} />
-          ))}
-        </div>
-      )}
+      {data.entries.length === 0
+        ? (
+          <div class="text-slate-500 text-center py-12">
+            This feed is empty.
+          </div>
+        )
+        : (
+          <div class="space-y-3">
+            {data.entries.map((entry, i) => (
+              <FeedItem
+                key={`${entry.url}-${entry.createdAt}-${i}`}
+                entry={entry}
+              />
+            ))}
+          </div>
+        )}
     </div>
   );
 };

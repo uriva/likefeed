@@ -11,7 +11,9 @@ type FeedEntry = {
   readonly detail: string;
 };
 
-const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> => {
+const buildFeedEntries = async (
+  userId: string,
+): Promise<readonly FeedEntry[]> => {
   const [reactionsResult, commentsResult, linksResult] = await Promise.all([
     db.query({
       reactions: {
@@ -34,7 +36,9 @@ const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> =
     }),
   ]);
 
-  const reactionEntries: FeedEntry[] = reactionsResult.reactions.map((r: any) => ({
+  const reactionEntries: FeedEntry[] = reactionsResult.reactions.map((
+    r: any,
+  ) => ({
     kind: "reaction",
     createdAt: r.createdAt,
     url: r.item?.url ?? "",
@@ -54,7 +58,9 @@ const buildFeedEntries = async (userId: string): Promise<readonly FeedEntry[]> =
     kind: "link",
     createdAt: l.createdAt,
     url: l.sourceItem?.url ?? "",
-    title: `${l.sourceItem?.title || l.sourceItem?.url} → ${l.targetItem?.title || l.targetItem?.url}`,
+    title: `${l.sourceItem?.title || l.sourceItem?.url} → ${
+      l.targetItem?.title || l.targetItem?.url
+    }`,
     detail: l.targetItem?.url ?? "",
   }));
 
@@ -75,11 +81,12 @@ const getFeed = async (
   params: Record<string, string>,
 ): Promise<Response> => {
   const userId = params.userId!;
-  if (!isValidUuid(userId))
+  if (!isValidUuid(userId)) {
     return Response.json(
       { error: "Invalid user ID", code: "INVALID_INPUT" },
       { status: 400 },
     );
+  }
   const [entries, email] = await Promise.all([
     buildFeedEntries(userId),
     getUserEmail(userId),
@@ -97,12 +104,11 @@ const escapeXml = (s: string): string =>
 
 const entryToRssItem = (entry: FeedEntry): string => {
   const date = new Date(entry.createdAt).toUTCString();
-  const description =
-    entry.kind === "reaction"
-      ? `${entry.detail}d ${entry.url}`
-      : entry.kind === "comment"
-        ? entry.detail
-        : `linked to ${entry.detail}`;
+  const description = entry.kind === "reaction"
+    ? `${entry.detail}d ${entry.url}`
+    : entry.kind === "comment"
+    ? entry.detail
+    : `linked to ${entry.detail}`;
   return `    <item>
       <title>${escapeXml(entry.title)}</title>
       <link>${escapeXml(entry.url)}</link>
@@ -117,11 +123,12 @@ const getFeedRss = async (
   params: Record<string, string>,
 ): Promise<Response> => {
   const userId = params.userId!;
-  if (!isValidUuid(userId))
+  if (!isValidUuid(userId)) {
     return Response.json(
       { error: "Invalid user ID", code: "INVALID_INPUT" },
       { status: 400 },
     );
+  }
   const [entries, email] = await Promise.all([
     buildFeedEntries(userId),
     getUserEmail(userId),
@@ -131,7 +138,9 @@ const getFeedRss = async (
 <rss version="2.0">
   <channel>
     <title>likefeed - ${escapeXml(email)}</title>
-    <description>likes, comments, and links from ${escapeXml(email)}</description>
+    <description>likes, comments, and links from ${
+    escapeXml(email)
+  }</description>
     <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
 ${entries.map(entryToRssItem).join("\n")}
   </channel>
