@@ -13,9 +13,9 @@
   },
   "imports": {
     "gamla": "jsr:@uri/gamla",
-    "@instantdb/admin": "npm:@instantdb/0.22.141@1.0.65",
-    "@instantdb/react": "npm:@instantdb/0.22.141@1.0.65",
-    "@instantdb/core": "npm:@instantdb/0.22.141@1.0.65",
+    "@instantdb/admin": "npm:@instantdb/admin@1.0.65",
+    "@instantdb/react": "npm:@instantdb/react@1.0.65",
+    "@instantdb/core": "npm:@instantdb/core@1.0.65",
     "preact": "npm:preact@10.26.7",
     "preact/hooks": "npm:preact@10.26.7/hooks",
     "preact/jsx-runtime": "npm:preact@10.26.7/jsx-runtime",
