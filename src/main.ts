@@ -58,7 +58,7 @@ const authenticateApiKey = async (
   const apiKeyRecord = apiKeys[0];
   if (!apiKeyRecord?.user) return null;
 
-  db.transact([
+  await db.transact([
     db.tx.apiKeys[apiKeyRecord.id]!.update({ lastUsedAt: Date.now() }),
   ]);
 
@@ -198,7 +198,7 @@ const resolveAuth = async (
   };
 };
 
-const handleRequest = async (req: Request): Promise<Response> => {
+export const handleRequest = async (req: Request): Promise<Response> => {
   if (req.method === "OPTIONS") {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
@@ -235,7 +235,9 @@ const handleRequest = async (req: Request): Promise<Response> => {
   }
 };
 
-const DIST_DIR = new URL("../web/dist", import.meta.url).pathname;
+const DIST_DIR = import.meta.url
+  ? new URL("../web/dist", import.meta.url).pathname
+  : "../web/dist";
 
 const contentTypeByExt: Record<string, string> = {
   ".html": "text/html; charset=utf-8",
@@ -306,4 +308,6 @@ const handler = async (req: Request): Promise<Response> => {
   return response;
 };
 
-Deno.serve({ port: Number(Deno.env.get("PORT") ?? 8000) }, handler);
+if (import.meta.main) {
+  Deno.serve({ port: Number(Deno.env.get("PORT") ?? 8000) }, handler);
+}
